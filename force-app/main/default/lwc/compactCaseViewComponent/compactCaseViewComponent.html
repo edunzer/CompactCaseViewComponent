@@ -67,8 +67,17 @@
                             <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
                         </template>
                     </lightning-progress-indicator>
-                    
-                    <!-- Additional components can be added here -->
+
+                    <!-- Email Messages in Accordion -->
+                    <div class="info-container slds-m-top_medium">
+                        <lightning-accordion allow-multiple-sections>
+                            <template for:each={emails} for:item="email">
+                                <lightning-accordion-section key={email.Id} label={email.formattedLabel}>
+                                    <lightning-formatted-rich-text value={email.body}></lightning-formatted-rich-text>
+                                </lightning-accordion-section>
+                            </template>
+                        </lightning-accordion>
+                    </div>
                 </div>
 
                 <!-- Modal/Popup Footer -->
