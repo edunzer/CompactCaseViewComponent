@@ -40,7 +40,7 @@ public with sharing class CompactCaseViewController {
 
         try {
             List<EmailMessage> emails = [
-                SELECT FromAddress, Subject, TextBody, CreatedDate
+                SELECT FromAddress, Subject, TextBody, HtmlBody, CreatedDate
                 FROM EmailMessage
                 WHERE ParentId = :caseId
                 ORDER BY CreatedDate DESC

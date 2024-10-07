@@ -89,9 +89,14 @@ export default class CompactCaseViewComponent extends LightningElement {
             .then((result) => {
                 this.emails = result.map(email => ({
                     ...email,
-                    body: this.extractLatestEmailContent(email.TextBody), // Extract the latest content
+                    body: this.extractLatestEmailContent(email.HtmlBody), // Use HtmlBody instead of TextBody
                     formattedLabel: 'From: ' + email.FromAddress
                 }));
+
+                // If no emails are found, set an empty message
+                if (this.emails.length === 0) {
+                    this.emails = [{ formattedLabel: 'No emails found for this case.', body: '' }];
+                }
             })
             .catch((error) => {
                 console.error('Error fetching emails:', error);
@@ -103,7 +108,7 @@ export default class CompactCaseViewComponent extends LightningElement {
         const regex = /(\r?\n|\r)?(?:From:|On .*? wrote:|Sent:|--- Original Message ---|____ Forwarded message ____)/i;
         
         // Use the regular expression to split the content and get the first part (new content)
-        const newContentArray = emailBody.split(regex);
+        const newContentArray = emailBody ? emailBody.split(regex) : [''];
         
         // Return the first part, which is assumed to be the latest email content
         return newContentArray[0].trim();
