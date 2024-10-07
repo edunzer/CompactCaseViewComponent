@@ -18,7 +18,7 @@ public with sharing class CompactCaseViewController {
         
         try {
             List<Case> cases = [
-                SELECT CaseNumber, Subject, Owner.Name, RecordType.Name, Status
+                SELECT CaseNumber, Subject, Owner.Name, RecordType.Name, Status, SuppliedEmail
                 FROM Case
                 WHERE Id IN (SELECT ParentId FROM CaseTeamMember WHERE MemberId = :currentUserId AND TeamRole.Name = 'Case Submitter')
                 AND Status != 'Closed'
@@ -39,12 +39,24 @@ public with sharing class CompactCaseViewController {
         }
 
         try {
+            // Fetch the Case record to get the SuppliedEmail
+            Case caseRecord = [SELECT SuppliedEmail FROM Case WHERE Id = :caseId LIMIT 1];
+            String suppliedEmail = caseRecord.SuppliedEmail;
+
+            // Fetch EmailMessage records where SuppliedEmail is in the addresses
             List<EmailMessage> emails = [
-                SELECT FromAddress, Subject, TextBody, HtmlBody, CreatedDate
+                SELECT FromAddress, ToAddress, CcAddress, BccAddress, Subject, TextBody, HtmlBody, CreatedDate
                 FROM EmailMessage
                 WHERE ParentId = :caseId
+                AND (
+                    FromAddress = :suppliedEmail OR
+                    ToAddress LIKE :('%' + suppliedEmail + '%') OR
+                    CcAddress LIKE :('%' + suppliedEmail + '%') OR
+                    BccAddress LIKE :('%' + suppliedEmail + '%')
+                )
                 ORDER BY CreatedDate DESC
             ];
+
             return emails;
         } catch (Exception e) {
             throw new AuraHandledException('An error occurred while retrieving email messages: ' + e.getMessage());
