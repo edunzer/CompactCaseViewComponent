@@ -19,7 +19,7 @@ public with sharing class CompactCaseViewController {
         try {
             // Query the Case records with the corrected field reference
             List<Case> cases = [
-                SELECT CaseNumber, Subject, Owner.Name, Status
+                SELECT CaseNumber, Subject, Owner.Name, Status, RecordType.Name
                 FROM Case
                 WHERE Id IN (SELECT ParentId FROM CaseTeamMember WHERE MemberId = :currentUserId AND TeamRole.Name = 'Case Submitter')
                 AND Status != 'Closed'
