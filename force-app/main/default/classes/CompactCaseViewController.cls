@@ -1,7 +1,6 @@
 public with sharing class CompactCaseViewController {
     @AuraEnabled(cacheable=true)
     public static List<Case> getUserCases() {
-        // Check read permission for the Case object
         if (!Schema.sObjectType.Case.isAccessible()) {
             throw new AuraHandledException('You do not have permission to access Case records.');
         }
@@ -10,6 +9,7 @@ public with sharing class CompactCaseViewController {
         if (!Schema.sObjectType.Case.fields.CaseNumber.isAccessible() || 
             !Schema.sObjectType.Case.fields.Subject.isAccessible() ||
             !Schema.sObjectType.Case.fields.OwnerId.isAccessible() || 
+            !Schema.sObjectType.Case.fields.RecordTypeId.isAccessible() || 
             !Schema.sObjectType.Case.fields.Status.isAccessible()) {
             throw new AuraHandledException('You do not have permission to access required Case fields.');
         }
@@ -17,9 +17,8 @@ public with sharing class CompactCaseViewController {
         Id currentUserId = UserInfo.getUserId();
         
         try {
-            // Query the Case records with the corrected field reference
             List<Case> cases = [
-                SELECT CaseNumber, Subject, Owner.Name, Status, RecordType.Name
+                SELECT CaseNumber, Subject, Owner.Name, RecordType.Name, Status
                 FROM Case
                 WHERE Id IN (SELECT ParentId FROM CaseTeamMember WHERE MemberId = :currentUserId AND TeamRole.Name = 'Case Submitter')
                 AND Status != 'Closed'
@@ -27,11 +26,28 @@ public with sharing class CompactCaseViewController {
                 LIMIT 100
             ];
 
-            // Return the cases list, even if it's empty
             return cases;
         } catch (Exception e) {
-            // Handle any exceptions that may occur
             throw new AuraHandledException('An error occurred while retrieving cases: ' + e.getMessage());
+        }
+    }
+
+    @AuraEnabled(cacheable=true)
+    public static List<EmailMessage> getCaseEmails(Id caseId) {
+        if (!Schema.sObjectType.EmailMessage.isAccessible()) {
+            throw new AuraHandledException('You do not have permission to access EmailMessage records.');
+        }
+
+        try {
+            List<EmailMessage> emails = [
+                SELECT FromAddress, Subject, TextBody, CreatedDate
+                FROM EmailMessage
+                WHERE ParentId = :caseId
+                ORDER BY CreatedDate DESC
+            ];
+            return emails;
+        } catch (Exception e) {
+            throw new AuraHandledException('An error occurred while retrieving email messages: ' + e.getMessage());
         }
     }
 }
