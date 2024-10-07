@@ -1,5 +1,6 @@
 import { LightningElement, wire, track } from 'lwc';
 import getUserCases from '@salesforce/apex/CompactCaseViewController.getUserCases';
+import getCaseEmails from '@salesforce/apex/CompactCaseViewController.getCaseEmails';
 
 const columns = [
     { 
@@ -33,12 +34,13 @@ export default class CompactCaseViewComponent extends LightningElement {
     @track errorMessage = '';
     @track isModalOpen = false;
     @track selectedCase = {};
+    @track emails = [];
     @track pathStages = [
         { label: 'New', value: 'New' },
         { label: 'Being Reviewed', value: 'Being Reviewed' },
         { label: 'On Hold', value: 'On Hold' },
         { label: 'Closed', value: 'Closed' }
-    ]; // Define stages for the path
+    ];
 
     columns = columns;
 
@@ -50,8 +52,8 @@ export default class CompactCaseViewComponent extends LightningElement {
                 OwnerName: caseRecord.Owner.Name,
                 caseNumber: caseRecord.CaseNumber,
                 subject: caseRecord.Subject,
-                Status: caseRecord.Status, // Map Status for the datatable
-                RecordTypeName: caseRecord.RecordType.Name // Map RecordType.Name for the modal
+                Status: caseRecord.Status, 
+                RecordTypeName: caseRecord.RecordType.Name
             }));
             this.errorMessage = '';
 
@@ -70,21 +72,49 @@ export default class CompactCaseViewComponent extends LightningElement {
 
         if (actionName === 'view_case_details') {
             this.selectedCase = {
+                caseId: row.Id,
                 caseNumber: row.CaseNumber,
                 ownerName: row.OwnerName,
-                recordTypeName: row.RecordTypeName, // Use RecordType.Name for modal
+                recordTypeName: row.RecordTypeName,
                 subject: row.Subject,
-                status: row.Status // Store Status for path component
+                status: row.Status
             };
+            this.fetchEmails(row.Id);
             this.isModalOpen = true;
         }
     }
 
+    fetchEmails(caseId) {
+        getCaseEmails({ caseId })
+            .then((result) => {
+                this.emails = result.map(email => ({
+                    ...email,
+                    body: this.extractLatestEmailContent(email.TextBody), // Extract the latest content
+                    formattedLabel: 'From: ' + email.FromAddress
+                }));
+            })
+            .catch((error) => {
+                console.error('Error fetching emails:', error);
+            });
+    }
+
+    extractLatestEmailContent(emailBody) {
+        // Regular expression to match common markers that indicate the start of a quoted message
+        const regex = /(\r?\n|\r)?(?:From:|On .*? wrote:|Sent:|--- Original Message ---|____ Forwarded message ____)/i;
+        
+        // Use the regular expression to split the content and get the first part (new content)
+        const newContentArray = emailBody.split(regex);
+        
+        // Return the first part, which is assumed to be the latest email content
+        return newContentArray[0].trim();
+    }
+
     closeModal() {
         this.isModalOpen = false;
+        this.emails = [];
     }
 
     get currentStep() {
-        return this.selectedCase.status || 'New'; // Use 'New' as default if status is undefined
+        return this.selectedCase.status || 'New';
     }
 }
