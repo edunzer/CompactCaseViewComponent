@@ -9,14 +9,16 @@
 
         <!-- Show data table if there are cases and no error -->
         <template if:true={cases.length}>
-            <lightning-datatable
-                key-field="id"
-                data={cases}
-                columns={columns}
-                hide-checkbox-column
-                max-row-selection="1"
-                onrowaction={handleRowAction}>
-            </lightning-datatable>
+            <div class="slds-p-around_small"> <!-- Add padding around the datatable -->
+                <lightning-datatable
+                    key-field="id"
+                    data={cases}
+                    columns={columns}
+                    hide-checkbox-column
+                    max-row-selection="1"
+                    onrowaction={handleRowAction}>
+                </lightning-datatable>
+            </div>
         </template>
     </lightning-card>
 
