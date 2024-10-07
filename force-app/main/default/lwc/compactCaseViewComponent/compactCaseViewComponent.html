@@ -61,7 +61,14 @@
                         </div>
                     </div>
                     
-                    <!-- Additional components can be added here and will be separated by the container -->
+                    <!-- Path Component using lightning-progress-indicator -->
+                    <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                        <template for:each={pathStages} for:item="step">
+                            <lightning-progress-step label={step.label} value={step.value} key={step.label}></lightning-progress-step>
+                        </template>
+                    </lightning-progress-indicator>
+                    
+                    <!-- Additional components can be added here -->
                 </div>
 
                 <!-- Modal/Popup Footer -->

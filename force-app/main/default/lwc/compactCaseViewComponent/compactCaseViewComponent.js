@@ -25,7 +25,7 @@ const columns = [
         initialWidth: 400 
     },
     { label: 'Owner', fieldName: 'OwnerName', type: 'text' },
-    { label: 'Status', fieldName: 'Status', type: 'text' } // Keep status in the datatable
+    { label: 'Status', fieldName: 'Status', type: 'text' }
 ];
 
 export default class CompactCaseViewComponent extends LightningElement {
@@ -33,6 +33,13 @@ export default class CompactCaseViewComponent extends LightningElement {
     @track errorMessage = '';
     @track isModalOpen = false;
     @track selectedCase = {};
+    @track pathStages = [
+        { label: 'New', value: 'New' },
+        { label: 'Being Reviewed', value: 'Being Reviewed' },
+        { label: 'On Hold', value: 'On Hold' },
+        { label: 'Closed', value: 'Closed' }
+    ]; // Define stages for the path
+
     columns = columns;
 
     @wire(getUserCases)
@@ -66,7 +73,8 @@ export default class CompactCaseViewComponent extends LightningElement {
                 caseNumber: row.CaseNumber,
                 ownerName: row.OwnerName,
                 recordTypeName: row.RecordTypeName, // Use RecordType.Name for modal
-                subject: row.Subject
+                subject: row.Subject,
+                status: row.Status // Store Status for path component
             };
             this.isModalOpen = true;
         }
@@ -74,5 +82,9 @@ export default class CompactCaseViewComponent extends LightningElement {
 
     closeModal() {
         this.isModalOpen = false;
+    }
+
+    get currentStep() {
+        return this.selectedCase.status || 'New'; // Use 'New' as default if status is undefined
     }
 }
