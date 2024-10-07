@@ -25,14 +25,14 @@ const columns = [
         initialWidth: 400 
     },
     { label: 'Owner', fieldName: 'OwnerName', type: 'text' },
-    { label: 'Status', fieldName: 'Status', type: 'text' },
+    { label: 'Status', fieldName: 'Status', type: 'text' } // Keep status in the datatable
 ];
 
 export default class CompactCaseViewComponent extends LightningElement {
     @track cases = [];
     @track errorMessage = '';
-    @track isModalOpen = false; // Track modal visibility
-    @track selectedCase = {}; // Store details of the selected case
+    @track isModalOpen = false;
+    @track selectedCase = {};
     columns = columns;
 
     @wire(getUserCases)
@@ -41,8 +41,10 @@ export default class CompactCaseViewComponent extends LightningElement {
             this.cases = data.map(caseRecord => ({
                 ...caseRecord,
                 OwnerName: caseRecord.Owner.Name,
-                caseNumber: caseRecord.CaseNumber, // Add case number to be used for the button
-                subject: caseRecord.Subject // Add subject to be used for the button
+                caseNumber: caseRecord.CaseNumber,
+                subject: caseRecord.Subject,
+                Status: caseRecord.Status, // Map Status for the datatable
+                RecordTypeName: caseRecord.RecordType.Name // Map RecordType.Name for the modal
             }));
             this.errorMessage = '';
 
@@ -55,25 +57,21 @@ export default class CompactCaseViewComponent extends LightningElement {
         }
     }
 
-    // Handle row action
     handleRowAction(event) {
         const actionName = event.detail.action.name;
         const row = event.detail.row;
 
         if (actionName === 'view_case_details') {
-            // Set the selected case details
             this.selectedCase = {
                 caseNumber: row.CaseNumber,
                 ownerName: row.OwnerName,
-                status: row.Status,
+                recordTypeName: row.RecordTypeName, // Use RecordType.Name for modal
                 subject: row.Subject
             };
-            // Open the modal
             this.isModalOpen = true;
         }
     }
 
-    // Close the modal
     closeModal() {
         this.isModalOpen = false;
     }
