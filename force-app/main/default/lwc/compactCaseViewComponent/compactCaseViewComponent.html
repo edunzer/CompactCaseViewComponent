@@ -1,0 +1,21 @@
+<template>
+    <lightning-card title="My Cases" icon-name="standard:case">
+        <!-- Show error message or no cases message in a tile -->
+        <template if:true={errorMessage}>
+            <lightning-tile label="Info" class="slds-m-around_medium">
+                <p>{errorMessage}</p>
+            </lightning-tile>
+        </template>
+
+        <!-- Show data table if there are cases and no error -->
+        <template if:true={cases.length}>
+            <lightning-datatable
+                key-field="id"
+                data={cases}
+                columns={columns}
+                hide-checkbox-column
+                max-row-selection="1">
+            </lightning-datatable>
+        </template>
+    </lightning-card>
+</template>
