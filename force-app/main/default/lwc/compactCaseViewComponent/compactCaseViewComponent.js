@@ -17,17 +17,14 @@ const columns = [
     { 
         label: 'Subject', 
         fieldName: 'subject', 
-        type: 'button', 
-        typeAttributes: { 
-            label: { fieldName: 'Subject' }, 
-            name: 'view_case_details',
-            variant: 'base'
-        }, 
+        type: 'text', // Change type to 'text' to prevent wrapping
         initialWidth: 400 
     },
     { label: 'Owner', fieldName: 'OwnerName', type: 'text' },
     { label: 'Status', fieldName: 'Status', type: 'text' }
 ];
+
+
 
 export default class CompactCaseViewComponent extends LightningElement {
     @track cases = [];
