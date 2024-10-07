@@ -4,7 +4,7 @@ import getCaseEmails from '@salesforce/apex/CompactCaseViewController.getCaseEma
 
 const columns = [
     { 
-        label: 'Case Number', 
+        label: 'Case #', 
         fieldName: 'caseNumber', 
         type: 'button', 
         typeAttributes: { 
