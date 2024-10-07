@@ -20,7 +20,7 @@ const columns = [
         type: 'text', // Change type to 'text' to prevent wrapping
         initialWidth: 400 
     },
-    { label: 'Owner', fieldName: 'OwnerName', type: 'text' },
+    { label: 'Case Agent', fieldName: 'OwnerName', type: 'text' },
     { label: 'Status', fieldName: 'Status', type: 'text' }
 ];
 
