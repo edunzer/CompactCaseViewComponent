@@ -20,7 +20,7 @@
         </template>
     </lightning-card>
 
-    <!-- Modal for displaying case details, styled like a highlights panel -->
+    <!-- Modal for displaying case details -->
     <template if:true={isModalOpen}>
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
             <div class="slds-modal__container">
@@ -33,30 +33,35 @@
                     <h2 class="slds-text-heading_medium">Case Details</h2>
                 </header>
 
-                <!-- Modal/Popup Body styled as a highlights panel -->
+                <!-- Modal/Popup Body -->
                 <div class="slds-modal__content slds-p-around_medium">
-                    <!-- Case Number at the top -->
-                    <div class="slds-text-heading_small slds-m-bottom_small">
-                        <strong>Case Number:</strong> {selectedCase.caseNumber}
-                    </div>
+                    <!-- Case Information Container with background color -->
+                    <div class="info-container">
+                        <!-- Case Number at the top -->
+                        <div class="slds-p-bottom_small">
+                            <strong>Case Number:</strong> {selectedCase.caseNumber}
+                        </div>
 
-                    <!-- Case Agent and Status on the same line -->
-                    <lightning-layout multiple-rows>
-                        <lightning-layout-item size="6">
-                            <div class="slds-text-title">Case Agent</div>
-                            <div class="slds-text-body_regular">{selectedCase.ownerName}</div>
-                        </lightning-layout-item>
-                        <lightning-layout-item size="6">
-                            <div class="slds-text-title">Status</div>
-                            <div class="slds-text-body_regular">{selectedCase.status}</div>
-                        </lightning-layout-item>
-                    </lightning-layout>
+                        <!-- Case Agent and Status side-by-side -->
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item size="6">
+                                <div class="slds-text-title">Case Agent</div>
+                                <div class="slds-text-body_regular">{selectedCase.ownerName}</div>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="6">
+                                <div class="slds-text-title">Status</div>
+                                <div class="slds-text-body_regular">{selectedCase.status}</div>
+                            </lightning-layout-item>
+                        </lightning-layout>
 
-                    <!-- Subject under the Case Agent and Status -->
-                    <div class="slds-m-top_medium">
-                        <div class="slds-text-title">Subject</div>
-                        <div class="slds-text-body_regular">{selectedCase.subject}</div>
+                        <!-- Subject underneath the Case Agent and Status -->
+                        <div class="slds-m-top_medium">
+                            <div class="slds-text-title">Subject</div>
+                            <div class="slds-text-body_regular">{selectedCase.subject}</div>
+                        </div>
                     </div>
+                    
+                    <!-- Additional components can be added here and will be separated by the container -->
                 </div>
 
                 <!-- Modal/Popup Footer -->

@@ -1,0 +1,6 @@
+.info-container {
+    background-color: #f4f6f9; /* Light background color for separation */
+    padding: 1rem; /* Add padding for spacing */
+    border-radius: 0.25rem; /* Optional: rounded corners for the container */
+    margin-bottom: 1rem; /* Add bottom margin to separate from other components */
+}
