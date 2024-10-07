@@ -2,37 +2,79 @@ import { LightningElement, wire, track } from 'lwc';
 import getUserCases from '@salesforce/apex/CompactCaseViewController.getUserCases';
 
 const columns = [
-    { label: 'Case Number', fieldName: 'CaseNumber', type: 'text', initialWidth: 100 }, // Smaller width
-    { label: 'Subject', fieldName: 'Subject', type: 'text', initialWidth: 300 }, // Larger width
+    { 
+        label: 'Case Number', 
+        fieldName: 'caseNumber', 
+        type: 'button', 
+        typeAttributes: { 
+            label: { fieldName: 'CaseNumber' }, 
+            name: 'view_case_details',
+            variant: 'base'
+        }, 
+        initialWidth: 100 
+    },
+    { 
+        label: 'Subject', 
+        fieldName: 'subject', 
+        type: 'button', 
+        typeAttributes: { 
+            label: { fieldName: 'Subject' }, 
+            name: 'view_case_details',
+            variant: 'base'
+        }, 
+        initialWidth: 400 
+    },
     { label: 'Owner', fieldName: 'OwnerName', type: 'text' },
     { label: 'Status', fieldName: 'Status', type: 'text' },
 ];
 
 export default class CompactCaseViewComponent extends LightningElement {
     @track cases = [];
-    @track errorMessage = ''; // Track for error message
+    @track errorMessage = '';
+    @track isModalOpen = false; // Track modal visibility
+    @track selectedCase = {}; // Store details of the selected case
     columns = columns;
 
     @wire(getUserCases)
     wiredCases({ error, data }) {
         if (data) {
-            console.log('Cases retrieved successfully:', data);
-            // Map data to include Owner's name
             this.cases = data.map(caseRecord => ({
                 ...caseRecord,
                 OwnerName: caseRecord.Owner.Name,
+                caseNumber: caseRecord.CaseNumber, // Add case number to be used for the button
+                subject: caseRecord.Subject // Add subject to be used for the button
             }));
-            this.errorMessage = ''; // Clear any previous error message
+            this.errorMessage = '';
 
-            // Check if no cases were returned
             if (this.cases.length === 0) {
                 this.errorMessage = 'You have no cases';
             }
         } else if (error) {
-            console.error('Error retrieving cases:', error);
-            // Parse error message and store it in errorMessage to display on screen
             this.errorMessage = error.body ? error.body.message : 'An unknown error occurred';
-            this.cases = []; // Clear cases if there's an error
+            this.cases = [];
         }
+    }
+
+    // Handle row action
+    handleRowAction(event) {
+        const actionName = event.detail.action.name;
+        const row = event.detail.row;
+
+        if (actionName === 'view_case_details') {
+            // Set the selected case details
+            this.selectedCase = {
+                caseNumber: row.CaseNumber,
+                ownerName: row.OwnerName,
+                status: row.Status,
+                subject: row.Subject
+            };
+            // Open the modal
+            this.isModalOpen = true;
+        }
+    }
+
+    // Close the modal
+    closeModal() {
+        this.isModalOpen = false;
     }
 }
