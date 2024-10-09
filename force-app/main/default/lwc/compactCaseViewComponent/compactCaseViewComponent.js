@@ -1,6 +1,6 @@
 import { LightningElement, wire, track } from 'lwc';
 import getUserCases from '@salesforce/apex/CompactCaseViewController.getUserCases';
-import getCaseEmails from '@salesforce/apex/CompactCaseViewController.getCaseEmails';
+import getCaseEmails from '@salesforce/apex/CaseEmailViewController.getCaseEmails';
 
 const columns = [
     { 
@@ -23,8 +23,6 @@ const columns = [
     { label: 'Case Agent', fieldName: 'OwnerName', type: 'text' },
     { label: 'Status', fieldName: 'Status', type: 'text' }
 ];
-
-
 
 export default class CompactCaseViewComponent extends LightningElement {
     @track cases = [];
@@ -90,11 +88,10 @@ export default class CompactCaseViewComponent extends LightningElement {
                     formattedLabel: 'From: ' + email.FromAddress
                 }));
 
-                // If no emails are found, set an empty message
                 if (this.emails.length === 0) {
                     this.emails = [{ formattedLabel: 'No emails found for this case.', body: '' }];
                 }
-            })
+            }) 
             .catch((error) => {
                 console.error('Error fetching emails:', error);
             });
