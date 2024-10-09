@@ -31,35 +31,4 @@ public with sharing class CompactCaseViewController {
             throw new AuraHandledException('An error occurred while retrieving cases: ' + e.getMessage());
         }
     }
-
-    @AuraEnabled(cacheable=true)
-    public static List<EmailMessage> getCaseEmails(Id caseId) {
-        if (!Schema.sObjectType.EmailMessage.isAccessible()) {
-            throw new AuraHandledException('You do not have permission to access EmailMessage records.');
-        }
-
-        try {
-            // Fetch the Case record to get the SuppliedEmail
-            Case caseRecord = [SELECT SuppliedEmail FROM Case WHERE Id = :caseId LIMIT 1];
-            String suppliedEmail = caseRecord.SuppliedEmail;
-
-            // Fetch EmailMessage records where SuppliedEmail is in the addresses
-            List<EmailMessage> emails = [
-                SELECT FromAddress, ToAddress, CcAddress, BccAddress, Subject, TextBody, HtmlBody, CreatedDate
-                FROM EmailMessage
-                WHERE ParentId = :caseId
-                AND (
-                    FromAddress = :suppliedEmail OR
-                    ToAddress LIKE :('%' + suppliedEmail + '%') OR
-                    CcAddress LIKE :('%' + suppliedEmail + '%') OR
-                    BccAddress LIKE :('%' + suppliedEmail + '%')
-                )
-                ORDER BY CreatedDate DESC
-            ];
-
-            return emails;
-        } catch (Exception e) {
-            throw new AuraHandledException('An error occurred while retrieving email messages: ' + e.getMessage());
-        }
-    }
 }
