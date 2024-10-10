@@ -33,11 +33,17 @@ public class CompactCaseViewControllerTest {
 
     @IsTest
     static void testGetUserCases() {
+        Test.startTest();
         // Call the method being tested
         List<Case> cases = CompactCaseViewController.getUserCases();
+        Test.stopTest();
 
         // Assert that the method returns the expected Case record
-        System.assertEquals(1, cases.size());
+        System.assertEquals(1, cases.size(), 'Expected exactly one case to be returned.');
+        
+        // Assert that specific fields are correctly retrieved
+        System.assertEquals('Test Case', cases[0].Subject, 'Unexpected Subject value in the retrieved case.');
+        System.assertEquals('New', cases[0].Status, 'Unexpected Status value in the retrieved case.');
     }
 
     @IsTest
@@ -51,5 +57,20 @@ public class CompactCaseViewControllerTest {
             // Do nothing - we're only interested in covering the code path
         }
         Test.stopTest();
+    }
+
+    @IsTest
+    static void testGetUserCasesForSpecificUser() {
+        // Find a user where the username contains 'ethan.dunzer@theopusgroup.com'
+        User specificUser = [SELECT Id FROM User WHERE Username LIKE '%ethan.dunzer@theopusgroup.com%' AND IsActive = true LIMIT 1];
+        System.runAs(specificUser) {
+            Test.startTest();
+            // Call the method being tested
+            List<Case> cases = CompactCaseViewController.getUserCases();
+            Test.stopTest();
+
+            // Assert that the method returns the expected Case record
+            System.assertEquals(1, cases.size(), 'Expected exactly one case to be returned.');
+        }
     }
 }
